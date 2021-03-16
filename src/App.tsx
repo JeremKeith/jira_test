@@ -11,7 +11,6 @@ function App() {
           Edit <code>src/App.tsxch
             
             
-            
             ange</code> and save to reload.
         </p>
 
