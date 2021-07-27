@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { cleanObject, useMount, useDebounce } from "../../utils/index";
 import * as qs from "qs";
 import { useHttp } from "utils/http";
+import styled from "@emotion/styled";
 const apiURL = process.env.REACT_APP_API_URL;
+
 export const ProjectListScreen = () => {
   const [param, setParam] = useState({
     name: "",
@@ -21,13 +23,16 @@ export const ProjectListScreen = () => {
     client("users").then(setUsers);
   });
   return (
-    <div>
+    <Container>
       <SearchPanel
         users={users}
         param={param}
         setParam={setParam}
       ></SearchPanel>
       <List list={list} users={users}></List>
-    </div>
+    </Container>
   );
 };
+const Container = styled.div`
+  padding: 3.2rem;
+`;
