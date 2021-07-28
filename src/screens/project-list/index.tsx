@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { cleanObject, useMount, useDebounce } from "../../utils/index";
 import { useHttp } from "utils/http";
 import styled from "@emotion/styled";
+import { Typography } from "antd";
 
 export const ProjectListScreen = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<null | Error>(null);
   const [param, setParam] = useState({
     name: "",
     personId: "",
@@ -15,7 +18,14 @@ export const ProjectListScreen = () => {
   const debounceParam = useDebounce(param, 200);
   const client = useHttp();
   useEffect(() => {
-    client("projects", { data: cleanObject(debounceParam) }).then(setList);
+    setIsLoading(true);
+    client("projects", { data: cleanObject(debounceParam) })
+      .then(setList)
+      .catch((error) => {
+        setError(error);
+        setList([]);
+      })
+      .finally(() => setIsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounceParam]);
   useMount(() => {
@@ -28,7 +38,10 @@ export const ProjectListScreen = () => {
         param={param}
         setParam={setParam}
       ></SearchPanel>
-      <List list={list} users={users}></List>
+      {error ? (
+        <Typography.Text type={"danger"}>{error.message}</Typography.Text>
+      ) : null}
+      <List dataSource={list} users={users} loading={isLoading}></List>
     </Container>
   );
 };
