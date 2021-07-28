@@ -5,27 +5,28 @@ import { cleanObject, useMount, useDebounce } from "../../utils/index";
 import { useHttp } from "utils/http";
 import styled from "@emotion/styled";
 import { Typography } from "antd";
+import { useAsync } from "utils/use-async";
+
+interface Project {
+  id: string;
+  name: string;
+  personId: string;
+  pin: string;
+  organization: string;
+  created: number;
+}
 
 export const ProjectListScreen = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<null | Error>(null);
   const [param, setParam] = useState({
     name: "",
     personId: "",
   });
   const [users, setUsers] = useState([]);
-  const [list, setList] = useState([]);
+  const { run, isLoading, error, data: list } = useAsync<Project[]>();
   const debounceParam = useDebounce(param, 200);
   const client = useHttp();
   useEffect(() => {
-    setIsLoading(true);
-    client("projects", { data: cleanObject(debounceParam) })
-      .then(setList)
-      .catch((error) => {
-        setError(error);
-        setList([]);
-      })
-      .finally(() => setIsLoading(false));
+    run(client("projects", { data: cleanObject(debounceParam) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounceParam]);
   useMount(() => {
@@ -41,7 +42,7 @@ export const ProjectListScreen = () => {
       {error ? (
         <Typography.Text type={"danger"}>{error.message}</Typography.Text>
       ) : null}
-      <List dataSource={list} users={users} loading={isLoading}></List>
+      <List dataSource={list || []} users={users} loading={isLoading}></List>
     </Container>
   );
 };
