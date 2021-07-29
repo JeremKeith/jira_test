@@ -6,6 +6,8 @@ import { useHttp } from "utils/http";
 import styled from "@emotion/styled";
 import { Typography } from "antd";
 import { useAsync } from "utils/use-async";
+import { useProjects } from "utils/project";
+import { useUsers } from "utils/user";
 
 interface Project {
   id: string;
@@ -21,28 +23,24 @@ export const ProjectListScreen = () => {
     name: "",
     personId: "",
   });
-  const [users, setUsers] = useState([]);
-  const { run, isLoading, error, data: list } = useAsync<Project[]>();
   const debounceParam = useDebounce(param, 200);
-  const client = useHttp();
-  useEffect(() => {
-    run(client("projects", { data: cleanObject(debounceParam) }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debounceParam]);
-  useMount(() => {
-    client("users").then(setUsers);
-  });
+  const { isLoading, error, data: list } = useProjects(debounceParam);
+  const { data: users } = useUsers();
   return (
     <Container>
       <SearchPanel
-        users={users}
+        users={users || []}
         param={param}
         setParam={setParam}
       ></SearchPanel>
       {error ? (
         <Typography.Text type={"danger"}>{error.message}</Typography.Text>
       ) : null}
-      <List dataSource={list || []} users={users} loading={isLoading}></List>
+      <List
+        dataSource={list || []}
+        users={users || []}
+        loading={isLoading}
+      ></List>
     </Container>
   );
 };

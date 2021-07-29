@@ -2,14 +2,15 @@ import { User } from "./search-pannel";
 import { Table, TableProps } from "antd";
 import dayjs from "dayjs";
 
-interface Project {
+export interface Project {
   id: string;
   name: string;
   personId: string;
-  pin: string;
+  pin: boolean;
   organization: string;
   created: number;
 }
+
 interface ListProps extends TableProps<Project> {
   users: User[];
 }
