@@ -10,7 +10,7 @@ export interface Project {
   organization: string;
   created: number;
 }
-
+//继承antd的table属性
 interface ListProps extends TableProps<Project> {
   users: User[];
 }
